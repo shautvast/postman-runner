@@ -4,7 +4,7 @@ use std::error::Error;
 use postman_runner::{collection, environment};
 
 #[tokio::test]
-async fn main() -> Result<(), Box<dyn Error + Send + Sync>>{
+async fn test_get() -> Result<(), Box<dyn Error + Send + Sync>>{
     let listener = std::net::TcpListener::bind("127.0.0.1:8080").unwrap();
     let expected_server_address = listener
         .local_addr()
