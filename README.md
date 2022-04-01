@@ -1,7 +1,11 @@
-__why__
-postman kinda sucks
+# why
+postman kinda sucks, but to throw away existing scripts would be wasteful
 
-__at this moment__
-runs a get request
+# status
+1. reads a postman json
+2. it runs a get request
 
-tested with wiremock
+# future plans
+* full http capabilities
+
+**tested with wiremock**
