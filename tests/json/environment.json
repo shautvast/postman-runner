@@ -1,0 +1,82 @@
+{
+  "id": "aee7a3a8-82bd-8442-43e6-7d65af8fb9ab",
+  "name": "pCAO-TST-DCR-Azure",
+  "values": [
+    {
+      "enabled": true,
+      "key": "url",
+      "value": "https://pcurrentaccountsopenapi-tst.dcr.non-prod.ichp.ing.net",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "p2pToken-generated",
+      "value": "undefined",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "encryptId",
+      "value": "",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "requesterId-generated",
+      "value": "",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "beneficiaryEncryptId",
+      "value": "",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "minorEncryptId",
+      "value": "xt-39ULRu4bPoDXJuy1hb9ur63rruffdkJSxlfZy5Bsj9GhZVpsUsy9P8okv2nxM-2WJfaQiknkx",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "RequesterRgb01",
+      "value": "undefined",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "RequesterRgb02",
+      "value": "hWJ58QwT_-FNgUbhmtq3JNqAOvCrr1iK7du0-sgoa6q604XSA-qr_X34StBMRHiVXepx_HPU6jNI",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ptoPToken",
+      "value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsIng1dCI6Ijc4QzM4MkM3OEM1MTk2NTQwODZDOUZBRTc1NUE4RDhENUM3RDE2MDAifQ.eyJzcmMiOiJwY3VycmVudGFjY291bnRzb3BlbmFwaS01YzZkZGRmODUtcnRjejIiLCJza3kiOiI2MDZlMDg0OTQyZDQzN2VlNzUyMmNhZmE4MTVkYzQ2NTgxMmQyOWRjZjhkY2EzYzExYjJjMjBmZDg3MGYxZGM4IiwidHlwIjoicmVxdWVzdCIsImV4cCI6MTY0ODU1MDE3MSwibmJmIjoxNjQ4NTQ5ODcxLCJpYXQiOjE2NDg1NDk4NzEsImlzcyI6ImdDdXN0b21lclJlcXVlc3RBUEkiLCJzdWIiOiJnQ3VzdG9tZXJSZXF1ZXN0QVBJIiwianRpIjoiYjJmY2ZlMWYtMTMyMC00NDdkLTkxZGQtNDMwZjdiNTNmYTJjIiwic2NvcGUiOlsiRElSRUNUX1dFQiJdfQ.cMX7M3XtjHvZtJcoJyHGdN2mxMcww8E9eHeev7Ya7QDFR55aGY-QJ1BGoL--erGacSgM3hyoneHI_iJnJdr_6lSwfVeYsOxYS64ZvQWtX8o1zJcBoKdeX8GsHwv0s9cDkTLT49pGOJJRxGVCOWJPED29Ia4QkaI-6lS09bDu8zVJ7fxI45r62JEkJvEIJbrW8DeExLz-ff53YA4PGCEdvAZuaktJsMT6y57e8qW535l_aeifsu1rZnSbaNsvnNigm3k869i486le-YD7Oo6YVL4-6LkeMI0ll9YIjyQGznTofOhET8ugvtkGbHzuqR2Jy4Wvak_z0BNrFNfLeo-Hz0YMXbwNEIhYsB4S14Irl4XWOairXmJPhWpDb8MVovauRmS5qJWuN8SJ_M86zX4sPN8_zQODdYGTssKtygts6sPIekJQGcgixsu11eeZvPkQphDxPHVwxqSjNz5ImhqZAfiXyM_gKWD2feNMe-nU6DWU9RQrM9B3y6QL6LIk2u8W",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "encryptedId",
+      "value": "GDg-dyAzCGL4BNXVoMHfkdAOfr69kzYVz3SnQakwhkCJnP3jOuE_2UDJTK0VbYbxCEEFyQuaTR7U",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "requestId",
+      "value": "bbfd1292-12d2-46ef-8bf3-a5cf294a806a",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "encryptedLRId",
+      "value": "ztkE9WGFZzDU6H5YBH0Gllo_CJ-W7c2JEiWoVwoWF9rUcfOcZlVMZAjpaeaVYwOZlEQyQ6eJ8M15",
+      "type": "text"
+    }
+  ],
+  "timestamp": 1648549884643,
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2022-03-29T10:34:30.609Z",
+  "_postman_exported_using": "Postman/5.5.5"
+}

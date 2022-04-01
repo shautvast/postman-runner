@@ -1,0 +1,576 @@
+{
+	"variables": [],
+	"info": {
+		"name": "pCurrentAccountsOpenAPI ICHP",
+		"_postman_id": "40e16780-f2ef-1128-dd6e-52449af17ad2",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "admin",
+			"description": "",
+			"item": [
+				{
+					"name": "keepalive",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/keepalive",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/recipe/{{requestId}}/events",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "ingredients(No PT Needed-Not in Prod)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/recipe/{{requestId}}/ingredients",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "visualize(NO PT Needed-Not in Prod)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/recipe/{{requestId}}/visualstate",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "V1-Endpoints",
+			"description": "",
+			"item": [
+				{
+					"name": "authorize",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/requests/for-opening/{{processName}}/{{requestId}}/authorisation-result",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "XSRF-TOKEN=1",
+								"description": ""
+							},
+							{
+								"key": "VND.ING.EXT.CTX-APP_ID",
+								"value": "LISA",
+								"description": ""
+							},
+							{
+								"key": "Origin",
+								"value": "{{url}}",
+								"description": ""
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "1",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-ING-REQ-CTX",
+								"value": "{{ptoPToken}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"CustomerRequest\": {\r\n    \"ExternalReference\": {\r\n      \"Id\": \"{{requestId}}\",\r\n      \"Origin\": \"gCurrAcctMgmtAPI\"\r\n    },\r\n    \"ReferenceId\": \"31180\",\r\n    \"PartyId\": \"156018381\",\r\n    \"Signatures\": \"1\",\r\n    \"Status\": \"Authorised\",\r\n    \"authorisation\": {\r\n      \"PartyId\": \"156018381\",\r\n      \"Method\": \"TAN\",\r\n      \"Status\": \"Authorised\",\r\n      \"DocumentReference\": \"211278af43287e7167a8854d87211278af43287e7167a8854d87211278af43287e7167a8854d87211278af43287e7167a8854d87211278af43287e7167a8854d\",\r\n      \"Role\": \"1\"\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "V2-Endpoints",
+			"description": "",
+			"item": [
+				{
+					"name": "p2ptoken(No PT Needed-Not in prod)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"ptoPToken\", JSON.parse(responseBody.substring(5)).ptoPToken);",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/support/p2ptoken",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "encrypt RGB(No PT Needed-Not in prod)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"encryptedId\", JSON.parse(responseBody.substring(5)).encryptedId);",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/support/101294077",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "encrypt LR RGB(No PT Needed-Not in prod)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"encryptedLRId\", JSON.parse(responseBody.substring(5)).encryptedId);",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/support/101294077",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "initiate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setEnvironmentVariable(\"requestId\", JSON.parse(responseBody.substring(5)).requestId);",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/requests/v2/{{processName}}/{{encryptedId}}",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Cookie",
+								"value": "XSRF-TOKEN=1",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "1",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "Origin",
+								"value": "{{url}}",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "X-ING-REQ-CTX",
+								"value": "{{ptoPToken}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"currentAccountChannelContext\": {\r\n  \t\"channelOfOrigin\":\"Kantoor\",\r\n  \t\"channelOfOpening\":\"BRANCH\"\r\n  \t\r\n  },\r\n  \"openType\": \"NORMAL\",\r\n  \"accountPackageType\": \"ORANGE_PACKAGE_WITH_DISCOUNT\"\r\n} "
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "overrideMagDatResult-RST005",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/requests/v2/{{processName}}/{{requestId}}/override-magdat-result",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "XSRF-TOKEN=1",
+								"description": ""
+							},
+							{
+								"key": "VND.ING.EXT.CTX-APP_ID",
+								"value": "LISA",
+								"description": ""
+							},
+							{
+								"key": "Origin",
+								"value": "{{url}}",
+								"description": ""
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "1",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-ING-REQ-CTX",
+								"value": "{{ptoPToken}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"currentAccountChannelContext\": {\r\n\t\t\"channelOfOrigin\":\"Kantoor\",\r\n  \t\t\"channelOfOpening\":\"BRANCH\"\r\n\t},\r\n\t\"channelOfOrigin\":\"ASSISSTED\",\r\n\t\"channelOfOpening\":\"BRANCH\",\r\n\t\"magDatOverridesPerParty\":[\r\n\t\t{\r\n\t\t\t\"partyId\" : \"401658163\",\r\n\t\t\t\"magDatOverrideList\":[\"EFR2\",\"EAU1\",\"RST005\"]\r\n\t\t}]\r\n} "
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "submit (adult)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/requests/v2/{{processName}}/{{requestId}}/{{encryptedId}}",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "XSRF-TOKEN=1",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "VND.ING.EXT.CTX-APP_ID",
+								"value": "LISA",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "Origin",
+								"value": "{{url}}",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "1",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-ING-REQ-CTX",
+								"value": "{{ptoPToken}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"openType\": \"NORMAL\",\r\n  \"currentAccountChannelContext\": {\r\n  \t\"channelOfOrigin\":\"Kantoor\",\r\n  \t\"channelOfOpening\":\"BRANCH\"\r\n  },\r\n  \"accountData\": {\r\n\t\"mobilePhone\" : \"0698765432\",\r\n\t\"addMingRequired\" : true\r\n  }\r\n} "
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "submit (minor)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/requests/v2/{{processName}}/{{requestId}}/{{encryptedId}}",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "XSRF-TOKEN=1",
+								"description": ""
+							},
+							{
+								"key": "VND.ING.EXT.CTX-APP_ID",
+								"value": "LISA",
+								"description": ""
+							},
+							{
+								"key": "Origin",
+								"value": "{{url}}",
+								"description": ""
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "1",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-ING-REQ-CTX",
+								"value": "{{ptoPToken}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"openType\": \"NORMAL\",\r\n  \"currentAccountChannelContext\": {\r\n  \t\"channelOfOrigin\":\"Kantoor\",\r\n  \t\"channelOfOpening\":\"BRANCH\"\r\n  },\r\n  \"accountData\": {\r\n\t\"mobilePhone\" : \"0698765432\",\r\n\t\"addMingRequired\" : false,\r\n\t\"legalRepresentativeId\" : \"{{encryptedLRId}}\"\r\n  }\r\n} "
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "authorize",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/requests/v2/{{processName}}/{{requestId}}/authorisation-result",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "XSRF-TOKEN=1",
+								"description": ""
+							},
+							{
+								"key": "VND.ING.EXT.CTX-APP_ID",
+								"value": "LISA",
+								"description": ""
+							},
+							{
+								"key": "Origin",
+								"value": "{{url}}",
+								"description": ""
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "1",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "X-ING-REQ-CTX",
+								"value": "{{ptoPToken}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"CustomerRequest\": {\r\n    \"ExternalReference\": {\r\n      \"Id\": \"{{requestId}}\",\r\n      \"Origin\": \"gCurrAcctMgmtAPI\"\r\n    },\r\n    \"ReferenceId\": \"31180\",\r\n    \"PartyId\": \"106497189\",\r\n    \"Signatures\": \"1\",\r\n    \"Status\": \"Authorised\",\r\n    \"authorisation\": {\r\n      \"PartyId\": \"106497189\",\r\n      \"Method\": \"TAN\",\r\n      \"Status\": \"Authorised\",\r\n      \"DocumentReference\": \"211278af43287e7167a8854d87211278af43287e7167a8854d87211278af43287e7167a8854d87211278af43287e7167a8854d87211278af43287e7167a8854d\",\r\n      \"Role\": \"1\"\r\n    }\r\n  }\r\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/requests/v2/{{processName}}/{{requestId}}/{{encryptedId}}/status",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "Cookie",
+								"value": "XSRF-TOKEN=1",
+								"description": ""
+							},
+							{
+								"key": "X-XSRF-TOKEN",
+								"value": "1",
+								"description": ""
+							},
+							{
+								"key": "Origin",
+								"value": "{{url}}",
+								"description": "",
+								"disabled": true
+							},
+							{
+								"key": "X-ING-REQ-CTX",
+								"value": "{{ptoPToken}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

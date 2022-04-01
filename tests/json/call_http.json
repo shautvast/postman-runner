@@ -1,0 +1,39 @@
+{
+	"variables": [],
+	"info": {
+		"name": "pCurrentAccountsOpenAPI ICHP",
+		"_postman_id": "40e16780-f2ef-1128-dd6e-52449af17ad2",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "admin",
+			"description": "",
+			"item": [
+				{
+					"name": "keepalive",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{url}}/headers",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

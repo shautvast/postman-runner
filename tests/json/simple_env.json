@@ -1,0 +1,16 @@
+{
+  "id": "aee7a3a8-82bd-8442-43e6-7d65af8fb9ab",
+  "name": "pCAO-TST-DCR-Azure",
+  "values": [
+    {
+      "enabled": true,
+      "key": "url",
+      "value": "http://localhost:8080",
+      "type": "text"
+    }    
+  ],
+  "timestamp": 1648549884643,
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2022-03-29T10:34:30.609Z",
+  "_postman_exported_using": "Postman/5.5.5"
+}
