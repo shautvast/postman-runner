@@ -13,8 +13,19 @@
 			"item": [
 				{
 					"name": "keepalive",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
 					"request": {
-						"url": "{{url}}/headers",
+						"url": "{{url}}/get200",
 						"method": "GET",
 						"header": [],
 						"body": {},

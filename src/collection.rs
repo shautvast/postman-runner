@@ -1,11 +1,11 @@
 use crate::environment::Environment;
+use crate::javascript;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use failure::format_err;
-use quick_js::{Context, JsValue};
-use lazy_static::lazy_static;
+use quick_js::Context;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Collection {
@@ -23,39 +23,22 @@ impl Collection {
         &self,
         env: Environment,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let js = Context::builder().console(|_, args: Vec<JsValue>| {
-            for jsv in args {
-                print!("{} ", jsv.as_str().unwrap());
-            }
-            println!();
-        }).build().unwrap();
-
-        setup_js_context(&js);
+        let js = javascript::new_runtime();
 
         for item in self.item.iter() {
-            handle_item(item, &env, &js).expect("");
+            handle_item(item, &env, &js)?;
         }
         Ok(())
     }
 }
 
-fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<(), Box<dyn std::error::Error+ Send + Sync>> {
     for item in parent_item.item.iter() {
-        handle_item(item, env, js).unwrap();
-    }
-
-    // events
-    println!("{:?}", parent_item.event);
-    for event in parent_item.event.iter() {
-        for script in event.script.exec.iter() {
-            js.eval(script).expect("cannot execute javascript");
-        }
+        handle_item(item, env, js)?;
     }
 
     // requests
     for req in parent_item.request.iter() {
-        println!("{}", &req.url);
-
         let mut builder = ureq::get(&env.resolve(&req.url).expect("url not valid"));
 
         for h in req.header.iter() {
@@ -78,9 +61,25 @@ fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<()
             builder.call().expect("cannot execute http request")
         };
 
-        if response.status() != 200 {
-            return Err(format_err!("Result {}", response.status()).into());
+        js.eval(&format!("let responseCode={{code:{}}}", response.status()))?;
+
+        // events
+        for event in parent_item.event.iter() {
+            for script in event.script.exec.iter() {
+                js.eval(script)?;
+            }
+
+            if event.listen == "test"{
+                let result = js.eval("run_tests()")?;
+                if result.as_str().unwrap() == "failure"{
+                    return Err(format_err!("test failure").into());
+                }
+            }
         }
+
+        // if response.status() != 200 {
+        //     return Err(format_err!("Result {}", response.status()).into());
+        // }
     }
 
     Ok(())
@@ -224,24 +223,6 @@ impl Body {
         }
     }
 }
-
-fn setup_js_context(js: &Context) {
-    js.eval(r#"
-    let environment = {
-        name: 'Test',
-        has: key => {
-            this[key] !== undefined
-        }
-    };
-
-    let pm = {
-        environment: environment,
-        setEnvironmentVariable: function(key,value){
-            pm[key]=value;
-        }
-    };"#).expect("");
-}
-
 
 #[cfg(test)]
 mod tests {
