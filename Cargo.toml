@@ -12,7 +12,7 @@ serde = "1.0.136"
 tokio = { version = "1", features = ["full"] }
 unicode-segmentation = "1.9.0"
 failure = "0.1.8"
-ureq = { git = "https://github.com/shautvast/ureq",branch = "main" }
+ureq = "2.4.0"
 quick-js = {version = "0.4.1", features = ["log", "chrono"]}
 lazy_static = "1.4.0"
 log = "0.4"
