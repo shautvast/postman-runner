@@ -1,52 +1,91 @@
 use crate::environment::Environment;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use failure::format_err;
+use quick_js::{Context, JsValue};
+use lazy_static::lazy_static;
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Collection {
     pub variables: Vec<String>,
-    pub info: Info,
+    pub info: Option<Info>,
     pub item: Vec<Item>,
 }
 
 impl Collection {
-    pub async fn run(
+    pub fn new(item: Item) -> Self {
+        Self { variables: vec![], info: None, item: vec![item] }
+    }
+
+    pub fn run(
         &self,
         env: Environment,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let client = reqwest::Client::new();
-        for it in self.item.iter() {
-            for it in it.item.iter() {
-                for req in it.request.iter() {
-                    let mut request_builder = client.get(env.resolve(&req.url).expect("url not valid"));
-                    for h in req.header.iter() {
-                        request_builder = request_builder.header(
-                            &env.resolve(&h.key).expect("header key not valid"),
-                            &env.resolve(&h.value).expect("header value not valid"),
-                        );
-                    }
-
-                    if let Some(raw) = &req.body.as_ref().unwrap().raw {
-                        let resolved_body = env
-                            .resolve(raw)
-                            .expect("cannot resolve body");
-                        request_builder = request_builder
-                            .body(resolved_body);
-                           
-                    }
-                    let response = request_builder.send().await?;
-                    if response.status() !=200{
-                        return Err(format_err!("Result {}", response.status()).into());
-                    }
-                }
+        let js = Context::builder().console(|_, args: Vec<JsValue>| {
+            for jsv in args {
+                print!("{} ", jsv.as_str().unwrap());
             }
+            println!();
+        }).build().unwrap();
+
+        setup_js_context(&js);
+
+        for item in self.item.iter() {
+            handle_item(item, &env, &js).expect("");
         }
         Ok(())
     }
 }
+
+fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    for item in parent_item.item.iter() {
+        handle_item(item, env, js).unwrap();
+    }
+
+    // events
+    println!("{:?}", parent_item.event);
+    for event in parent_item.event.iter() {
+        for script in event.script.exec.iter() {
+            js.eval(script).expect("cannot execute javascript");
+        }
+    }
+
+    // requests
+    for req in parent_item.request.iter() {
+        println!("{}", &req.url);
+
+        let mut builder = ureq::get(&env.resolve(&req.url).expect("url not valid"));
+
+        for h in req.header.iter() {
+            builder = builder.set(
+                &env.resolve(&h.key).expect("header key not valid"),
+                &env.resolve(&h.value).expect("header value not valid"),
+            );
+        }
+
+        let response = if let Some(body) = &req.body {
+            if let Some(raw) = body.raw.as_ref() {
+                let resolved_body = env
+                    .resolve(raw)
+                    .expect("cannot resolve body");
+                builder.send_string(&resolved_body).expect("cannot execute http request")
+            } else {
+                builder.call().expect("cannot execute http request")
+            }
+        } else {
+            builder.call().expect("cannot execute http request")
+        };
+
+        if response.status() != 200 {
+            return Err(format_err!("Result {}", response.status()).into());
+        }
+    }
+
+    Ok(())
+}
+
 
 pub fn read_from_file(file_name: &str) -> Result<Collection, Box<dyn Error>> {
     let file = File::open(file_name)?;
@@ -55,14 +94,14 @@ pub fn read_from_file(file_name: &str) -> Result<Collection, Box<dyn Error>> {
     Ok(collection)
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Info {
     pub name: String,
     pub description: String,
     pub schema: String,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Item {
     pub name: String,
     pub description: Option<String>,
@@ -73,42 +112,95 @@ pub struct Item {
     pub request: Option<Request>,
 }
 
+impl Item {
+    pub fn new(name: &str, request: Request, event: Event) -> Self {
+        Self {
+            name: name.to_owned(),
+            description: None,
+            item: vec![],
+            event: vec![event],
+            request: Some(request),
+        }
+    }
+}
+
 fn empty_item_list() -> Vec<Item> {
     Vec::new()
 }
+
 fn empty_event_list() -> Vec<Event> {
     Vec::new()
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Event {
     listen: String,
     script: Script,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
-struct Script {
+impl Event {
+    pub fn new(script: Script) -> Self {
+        Self {
+            listen: "test".to_owned(),
+            script,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
+pub struct Script {
     r#type: String,
     exec: Vec<String>,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+impl Script {
+    pub fn new(code: &str) -> Self {
+        Self {
+            r#type: "application/javascript".to_owned(),
+            exec: vec![code.to_owned()],
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Request {
     url: String,
     method: Method,
     header: Vec<Header>,
     body: Option<Body>,
-    description: String,
+    description: Option<String>,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
-struct Header {
+impl Request {
+    pub fn new(url: &str) -> Self {
+        Self {
+            url: url.to_owned(),
+            method: Method::GET,
+            header: vec![],
+            body: None,
+            description: None,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
+pub struct Header {
     key: String,
     value: String,
-    description: String,
+    description: Option<String>,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+impl Header {
+    pub fn new(name: &str, value: &str) -> Self {
+        Self {
+            key: name.to_owned(),
+            value: value.to_owned(),
+            description: None,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
 enum Method {
     GET,
     POST,
@@ -117,20 +209,47 @@ enum Method {
     DELETE,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
-struct Body {
+#[derive(Deserialize, Serialize, Debug, PartialEq)]
+pub struct Body {
     mode: Option<String>,
+    //other modes than 'raw'?
     raw: Option<String>,
 }
 
+impl Body {
+    pub fn new(body: &str) -> Self {
+        Self {
+            mode: Some("raw".to_owned()), //option?
+            raw: Some(body.to_owned()), //option?
+        }
+    }
+}
+
+fn setup_js_context(js: &Context) {
+    js.eval(r#"
+    let environment = {
+        name: 'Test',
+        has: key => {
+            this[key] !== undefined
+        }
+    };
+
+    let pm = {
+        environment: environment,
+        setEnvironmentVariable: function(key,value){
+            pm[key]=value;
+        }
+    };"#).expect("");
+}
+
+
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]
     fn test_read_collection() {
         let collection = read_from_file("tests/json/json_read_test.json").expect("");
-        assert_eq!(collection.info.name, "pCurrentAccountsOpenAPI ICHP");
+        assert_eq!(collection.info.unwrap().name, "pCurrentAccountsOpenAPI ICHP");
     }
 }

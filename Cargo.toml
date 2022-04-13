@@ -6,15 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+futures = "0.3"
 deno_core = "0.126.0"
 serde_json = "^1.0.79"
 serde = "1.0.136"
-deno_console = "0.44.0"
-#hyper = { version = "0.14.18", features = ["client", "http1", "http2", "tcp", "runtime"] }
 tokio = { version = "1", features = ["full"] }
 unicode-segmentation = "1.9.0"
 failure = "0.1.8"
-reqwest = {version = "0.11.10", features = [  "blocking", "cookies", "json","multipart"]}
+ureq = { git = "https://github.com/shautvast/ureq",branch = "main" }
+quick-js = {version = "0.4.1", features = ["log", "chrono"]}
+lazy_static = "1.4.0"
+log = "0.4"
+simple-logging = "2.0"
 
 [dev-dependencies]
 wiremock = "0.5.11"

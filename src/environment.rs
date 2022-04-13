@@ -3,6 +3,7 @@ use serde::Deserialize;
 use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
+use std::time::{SystemTime, UNIX_EPOCH};
 use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -10,7 +11,23 @@ pub struct Environment {
     pub id: String,
     pub name: String,
     pub values: Vec<Value>,
-    pub timestamp: u64,
+    pub timestamp: u128,
+}
+
+impl Environment {
+    pub fn empty() -> Self{
+        let start = SystemTime::now();
+        let since_the_epoch = start
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards");
+
+        Self{
+            id: "".to_owned(), //some uuid?
+            name: "".to_owned(),
+            values: vec![],
+            timestamp: since_the_epoch.as_millis()
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
