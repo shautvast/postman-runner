@@ -1055,12 +1055,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sync_wrapper"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20518fe4a4c9acf048008599e464deb21beeae3d3578418951a189c235a7a9a8"
-
-[[package]]
 name = "synstructure"
 version = "0.12.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1242,7 +1236,8 @@ checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 [[package]]
 name = "ureq"
 version = "2.4.0"
-source = "git+https://github.com/shautvast/ureq?branch=main#21238ef2e0586da026d496304fef16a5b954dfda"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9399fa2f927a3d327187cbd201480cee55bee6ac5d3c77dd27f0c6814cff16d5"
 dependencies = [
  "base64",
  "chunked_transfer",
@@ -1250,7 +1245,6 @@ dependencies = [
  "log",
  "once_cell",
  "rustls",
- "sync_wrapper",
  "url",
  "webpki",
  "webpki-roots",
