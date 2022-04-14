@@ -23,7 +23,7 @@ impl Collection {
         &self,
         env: Environment,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let js = javascript::new_runtime();
+        let js = javascript::new_runtime()?;
 
         for item in self.item.iter() {
             handle_item(item, &env, &js)?;
