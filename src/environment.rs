@@ -1,8 +1,10 @@
+use std::collections::HashSet;
 use failure::format_err;
 use serde::Deserialize;
 use std::error::Error;
 use std::fs::File;
-use std::io::BufReader;
+use std::hash::{Hash, Hasher};
+use std::io::{BufReader, empty};
 use std::time::{SystemTime, UNIX_EPOCH};
 use unicode_segmentation::UnicodeSegmentation;
 
@@ -10,27 +12,33 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct Environment {
     pub id: String,
     pub name: String,
-    pub values: Vec<Value>,
+    pub values: HashSet<Value>,
     pub timestamp: u128,
 }
 
 impl Environment {
-    pub fn empty() -> Self{
+    pub fn empty() -> Self {
         let start = SystemTime::now();
         let since_the_epoch = start
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards");
 
-        Self{
+        Self {
             id: "".to_owned(), //some uuid?
             name: "".to_owned(),
-            values: vec![],
-            timestamp: since_the_epoch.as_millis()
+            values: HashSet::new(),
+            timestamp: since_the_epoch.as_millis(),
         }
+    }
+
+    pub fn with(key: &str, value: &str) -> Self {
+        let mut env = Environment::empty();
+        env.values.insert(Value::new(key, value));
+        env
     }
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, Eq)]
 pub struct Value {
     pub enabled: bool,
     pub key: String,
@@ -38,7 +46,30 @@ pub struct Value {
     pub r#type: Type,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+impl Value {
+    pub fn new(key: &str, value: &str) -> Self {
+        Self {
+            enabled: true,
+            key: key.to_owned(),
+            value: value.to_owned(),
+            r#type: Type::Text,
+        }
+    }
+}
+
+impl Hash for Value {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.key.hash(state);
+    }
+}
+
+impl PartialEq for Value{
+    fn eq(&self, other: &Self) -> bool {
+        self.key == other.key
+    }
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub enum Type {
     Text,
@@ -101,7 +132,6 @@ impl Environment {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

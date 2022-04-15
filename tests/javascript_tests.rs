@@ -24,6 +24,7 @@ async fn all_tests() {
     expect_200_and_get201_old_api();
     expect_and_get200_new_api();
     expect_200_and_get201_new_api();
+    has_env_key();
 }
 
 fn expect_and_get200_old_api() {
@@ -68,4 +69,12 @@ fn expect_200_and_get201_new_api() {
                   ))));
      postman_runner::run(collection, Environment::empty()).expect("")
     });
+}
+
+fn has_env_key() {
+    let collection = Collection::new(
+        Item::new("test",
+                  Request::new("http://localhost:8080/get201"),
+                  Event::new(Script::new(r#"pm.test("has key",()=>pm.environment.has('key'))"#))));
+    postman_runner::run(collection, Environment::with("key","value")).expect("failed to run collection")
 }

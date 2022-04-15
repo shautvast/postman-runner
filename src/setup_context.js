@@ -1,8 +1,3 @@
-let environment = {
-    name: 'Test',
-    has: key => this[key] !== undefined
-};
-
 let tests = {};
 const run_tests = () => {
     for (const test in tests) {
@@ -23,7 +18,13 @@ const run_tests = () => {
     return "succes";
 };
 let pm = {
-    environment: environment,
+    environment: {
+        name: 'Test',
+        has: key => {
+            return pm.environment[key] !== undefined
+        },
+        get: key => pm.environment[key],
+    },
 
     test: (name, fn) => {
         tests[name] = fn;

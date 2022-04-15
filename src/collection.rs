@@ -1,4 +1,5 @@
-use crate::environment::Environment;
+use std::collections::HashMap;
+use crate::environment::{Environment, Value};
 use crate::javascript;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
@@ -21,24 +22,32 @@ impl Collection {
 
     pub fn run(
         &self,
-        env: Environment,
+        mut env: Environment,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let js = javascript::new_runtime()?;
 
         for item in self.item.iter() {
-            handle_item(item, &env, &js)?;
+            handle_item(item, &mut env, &js)?;
         }
         Ok(())
     }
 }
 
-fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<(), Box<dyn std::error::Error+ Send + Sync>> {
+fn handle_item(parent_item: &Item, env: &mut Environment, js: &Context) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     for item in parent_item.item.iter() {
         handle_item(item, env, js)?;
     }
 
     // requests
     for req in parent_item.request.iter() {
+        // update js environment
+        let mut code = String::new();
+        for value in env.values.iter() {
+            code.push_str(&format!("pm.environment['{}']='{}';\n", &value.key, &value.value));
+        }
+        js.eval(&code)?;
+
+        // handle request
         let mut builder = ureq::get(&env.resolve(&req.url).expect("url not valid"));
 
         for h in req.header.iter() {
@@ -49,6 +58,7 @@ fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<()
         }
 
         let response = if let Some(body) = &req.body {
+            // request has a body
             if let Some(raw) = body.raw.as_ref() {
                 let resolved_body = env
                     .resolve(raw)
@@ -58,9 +68,11 @@ fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<()
                 builder.call().expect("cannot execute http request")
             }
         } else {
+            // request without body
             builder.call().expect("cannot execute http request")
         };
 
+        // add response to js environment
         js.eval(&format!(r#"let responseCode={{code:{} }}; pm.response={{to: {{have: {{status : expected => {{
             let result = (expected === {});
             if (!result) {{
@@ -72,12 +84,20 @@ fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<()
         // events
         for event in parent_item.event.iter() {
             for script in event.script.exec.iter() {
+                // exceute script
                 js.eval(script)?;
+                // get environment from js
+                let env_json = js.eval("JSON.stringify(pm.environment)")?;
+                let data: HashMap<&str, &str> = serde_json::from_str(env_json.as_str().unwrap()).unwrap();
+                // and update 'rust' env
+                for (key, value) in data {
+                    env.values.replace(Value::new(key, value));
+                }
             }
 
-            if event.listen == "test"{
+            if event.listen == "test" {
                 let result = js.eval("run_tests()")?;
-                if result.as_str().unwrap() == "failure"{
+                if result.as_str().unwrap() == "failure" {
                     return Err(format_err!("test failure").into());
                 }
             }
