@@ -20,11 +20,13 @@ async fn all_tests() {
         .mount(&mock_server)
         .await;
 
-    expect_and_get200();
-    expect_200_and_get201();
+    expect_and_get200_old_api();
+    expect_200_and_get201_old_api();
+    expect_and_get200_new_api();
+    expect_200_and_get201_new_api();
 }
 
-fn expect_and_get200() {
+fn expect_and_get200_old_api() {
     let collection = Collection::new(
         Item::new("test",
                   Request::new("http://localhost:8080/get200"),
@@ -32,13 +34,38 @@ fn expect_and_get200() {
     postman_runner::run(collection, Environment::empty()).expect("")
 }
 
+fn expect_and_get200_new_api() {
+    let collection = Collection::new(
+        Item::new("test",
+                  Request::new("http://localhost:8080/get200"),
+                  Event::new(Script::new(r#"pm.test("Status code is 200",
+                  function(){
+                    return pm.response.to.have.status(200);
+                  })"#
+                  ))));
+    postman_runner::run(collection, Environment::empty()).expect("")
+}
 
-fn expect_200_and_get201() {
+fn expect_200_and_get201_old_api() {
     cool_asserts::assert_panics!({
     let collection = Collection::new(
         Item::new("test",
                   Request::new("http://localhost:8080/get201"),
                   Event::new(Script::new(r#"tests["expect200"] = responseCode.code === 200"#))));
     postman_runner::run(collection, Environment::empty()).expect("")
+    });
+}
+
+fn expect_200_and_get201_new_api() {
+    cool_asserts::assert_panics!({
+     let collection = Collection::new(
+        Item::new("test",
+                  Request::new("http://localhost:8080/get201"),
+                  Event::new(Script::new(r#"pm.test("Status code is 200",
+                  function(){
+                    return pm.response.to.have.status(200);
+                  })"#
+                  ))));
+     postman_runner::run(collection, Environment::empty()).expect("")
     });
 }

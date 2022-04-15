@@ -61,7 +61,13 @@ fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<()
             builder.call().expect("cannot execute http request")
         };
 
-        js.eval(&format!("let responseCode={{code:{}}}", response.status()))?;
+        js.eval(&format!(r#"let responseCode={{code:{} }}; pm.response={{to: {{have: {{status : expected => {{
+            let result = (expected === {});
+            if (!result) {{
+                console.log(expected + " !== " + {});
+            }}
+            return result;
+            }} }} }} }};"#, response.status(), response.status(), response.status()))?;
 
         // events
         for event in parent_item.event.iter() {
@@ -76,14 +82,10 @@ fn handle_item(parent_item: &Item, env: &Environment, js: &Context) -> Result<()
                 }
             }
         }
-
-        // if response.status() != 200 {
-        //     return Err(format_err!("Result {}", response.status()).into());
-        // }
     }
 
     Ok(())
-}
+}//let outcome = expected === {};
 
 
 pub fn read_from_file(file_name: &str) -> Result<Collection, Box<dyn Error>> {

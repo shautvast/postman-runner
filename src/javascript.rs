@@ -4,7 +4,7 @@ use quick_js::{Context, JsValue};
 pub(crate) fn new_runtime() -> Result<Context, Box<dyn Error + Send + Sync>> {
     let context = Context::builder().console(|_, args: Vec<JsValue>| {
         for jsv in args {
-            print!("{} ", jsv.as_str().unwrap());
+            print!("{:?} ", jsv);
         }
         println!();
     }).build().unwrap();
